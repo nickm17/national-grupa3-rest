@@ -2,12 +2,8 @@ package com.siit.nationalgrupa3.hr.employee.domain.model;
 
 import java.time.LocalDate;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,12 +14,13 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class EmployeeDto {
-
-    private Integer id;
+public class EmployeeDtoPostRequest {
 
     private String job;
 
+    private Integer id;
+
+    @NotBlank
     private String name;
 
     private Integer manager;
@@ -32,7 +29,7 @@ public class EmployeeDto {
 
     private Integer comision;
 
-    private DepartmentDto department;
+    private Integer departmentId;
 
     @Builder.Default
     private LocalDate hiredate = LocalDate.now();
