@@ -1,20 +1,27 @@
 package com.siit.nationalgrupa3.hr.employee.service;
 
 import com.siit.nationalgrupa3.hr.employee.domain.entity.EmployeeEntity;
-import com.siit.nationalgrupa3.hr.employee.domain.model.EmployeeDtoPostRequest;
+import com.siit.nationalgrupa3.hr.employee.domain.model.EmployeeDtoCreateRequest;
 import com.siit.nationalgrupa3.hr.employee.domain.model.EmployeeDtoUpdateRequest;
+import com.siit.nationalgrupa3.hr.employee.exception.EmployeeNotFoundException;
 import com.siit.nationalgrupa3.hr.employee.mapper.EmployeeDtoPostRequestToEmployeeEntityMapper;
 import com.siit.nationalgrupa3.hr.employee.mapper.EmployeeDtoToEmployeeEntityMapper;
 import com.siit.nationalgrupa3.hr.employee.mapper.EmployeeEntityToEmployeeDtoMapper;
-import com.siit.nationalgrupa3.hr.employee.domain.model.EmployeeDto;
+import com.siit.nationalgrupa3.hr.employee.domain.model.EmployeeDtoResponse;
 import com.siit.nationalgrupa3.hr.employee.repository.DepartmentRepository;
 import com.siit.nationalgrupa3.hr.employee.repository.EmployeeRepository;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 
 import static java.util.stream.Collectors.toList;
 
@@ -45,28 +52,32 @@ public class EmployeeService {
 //        counter = i;
 //    }
 
-    public List<EmployeeDto> getAllEmployees() {
+    @Transactional(readOnly = true)
+    public List<EmployeeDtoResponse> getAllEmployees() {
         return employeeRepository.findAll()
                                  .stream()
                                  .map(empEnt -> employeeEntityToEmployeeDtoMapper.mapEntityToDto(empEnt))
                                  .collect(toList());
     }
 
-    public List<EmployeeDto> getAllEmployeesByJob(String job) {
+    @Transactional(readOnly = true)
+    public List<EmployeeDtoResponse> getAllEmployeesByJob(String job) {
         return employeeRepository.findAllByJob(job)
                                  .stream()
                                  .map(empEnt -> employeeEntityToEmployeeDtoMapper.mapEntityToDto(empEnt))
                                  .collect(toList());
     }
 
-    public EmployeeDto getEmployeeById(Integer id) {
+    @Transactional(readOnly = true)
+    public EmployeeDtoResponse getEmployeeById(Integer id) {
         return employeeEntityToEmployeeDtoMapper.mapEntityToDto(employeeRepository.findById(id).orElseThrow());
     }
 
-    public EmployeeDto createEmployee(EmployeeDtoPostRequest employeeDtoPostRequest) {
+    @Transactional(readOnly = false)
+    public EmployeeDtoResponse createEmployee(EmployeeDtoCreateRequest employeeDtoCreateRequest) {
 
-        EmployeeEntity employeeEntity = employeeDtoPostRequestToEmployeeEntityMapper.mapDtoPostRequestToEntity(employeeDtoPostRequest);
-//        employeeEntity.setDepartment(departmentRepository.findById(employeeDtoPostRequest.getDepartmentId()).orElseThrow());
+        EmployeeEntity employeeEntity = employeeDtoPostRequestToEmployeeEntityMapper.mapDtoPostRequestToEntity(employeeDtoCreateRequest);
+//        employeeEntity.setDepartment(departmentRepository.findById(employeeDtoCreateRequest.getDepartmentId()).orElseThrow());
 
         // alte actiuni pe entity
         EmployeeEntity savedEntity = employeeRepository.save(employeeEntity);
@@ -74,9 +85,54 @@ public class EmployeeService {
         return employeeEntityToEmployeeDtoMapper.mapEntityToDto(savedEntity);
     }
 
-    public EmployeeDto updateEmployee(EmployeeDtoUpdateRequest employeeDtoUpdateRequest) {
+    @Transactional(readOnly = false)
+    public List<EmployeeDtoResponse> createEmployees(List<EmployeeDtoCreateRequest> employeeDtoCreateRequestList) {
 
-        EmployeeEntity employeeEntity = employeeRepository.findById(employeeDtoUpdateRequest.getId()).get();
+        return employeeDtoCreateRequestList.stream()
+                                           .map(emplReq -> employeeDtoPostRequestToEmployeeEntityMapper.mapDtoPostRequestToEntity(emplReq))
+                                           .map(employeeEntity -> employeeRepository.save(employeeEntity))
+                                           .map(employeeEntitySaved -> employeeEntityToEmployeeDtoMapper.mapEntityToDto(employeeEntitySaved))
+                                           .collect(toList());
+    }
+
+    @SneakyThrows
+    @Transactional(readOnly = false)
+    public List<EmployeeDtoResponse> createEmployeesFromFile(MultipartFile file) {
+
+        if(file.isEmpty()){
+            // throw exception
+        }
+
+        byte[] bytes = file.getBytes();
+        String fileContent = new String(bytes);
+        String[] rows = fileContent.split("\n");
+
+        List<EmployeeDtoCreateRequest> toCreate = new ArrayList<>();
+
+        for(String row : rows){
+            String[] rowSplitted = row.split(",");
+            if (rowSplitted.length != 0) {
+                EmployeeDtoCreateRequest employeeDtoCreateRequest = EmployeeDtoCreateRequest.builder()
+                                                                         .job(rowSplitted[0])
+                                                                         .name(rowSplitted[1])
+                                                                         .manager(Integer.valueOf(rowSplitted[2]))
+                                                                         .salary(Integer.valueOf(rowSplitted[3]))
+                                                                         .comision(Integer.valueOf(rowSplitted[4]))
+                                                                         .departmentId(Integer.valueOf(rowSplitted[5]))
+                                                                         .hiredate(LocalDate.parse(rowSplitted[6]))
+                                                                         .build();
+                toCreate.add(employeeDtoCreateRequest);
+            }
+        }
+
+        return createEmployees(toCreate);
+    }
+
+    @Transactional
+    public EmployeeDtoResponse updateEmployee(EmployeeDtoUpdateRequest employeeDtoUpdateRequest) {
+
+        Optional<EmployeeEntity> byId = employeeRepository.findById(employeeDtoUpdateRequest.getId());
+        EmployeeEntity employeeEntity = byId.orElseThrow(() -> new EmployeeNotFoundException("No employee found for given id: " + employeeDtoUpdateRequest.getId()));
         // setam campurile ce vrem sa fie updatate
         if (employeeDtoUpdateRequest.getComision() != null){ // facem update doar daca exista
             employeeEntity.setComision(employeeDtoUpdateRequest.getComision());
@@ -86,9 +142,14 @@ public class EmployeeService {
         employeeEntity.setManager(employeeDtoUpdateRequest.getManager());
 
 
-        EmployeeEntity savedEntity = employeeRepository.save(employeeEntity);
+//        EmployeeEntity savedEntity = employeeRepository.save(employeeEntity); // acest save e facut automat de transactional
 
-        return employeeEntityToEmployeeDtoMapper.mapEntityToDto(savedEntity);
+        return employeeEntityToEmployeeDtoMapper.mapEntityToDto(employeeEntity);
+    }
+
+    @Transactional
+    public void deleteEmployeeById(Integer id) {
+        employeeRepository.deleteById(id);
     }
 
 }

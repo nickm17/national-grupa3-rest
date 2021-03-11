@@ -1,9 +1,7 @@
 package com.siit.nationalgrupa3.hr.employee.mapper;
 
 import com.siit.nationalgrupa3.hr.employee.domain.entity.DepartmentEntity;
-import com.siit.nationalgrupa3.hr.employee.domain.entity.EmployeeEntity;
 import com.siit.nationalgrupa3.hr.employee.domain.model.DepartmentDto;
-import com.siit.nationalgrupa3.hr.employee.domain.model.EmployeeDto;
 
 import org.springframework.stereotype.Component;
 

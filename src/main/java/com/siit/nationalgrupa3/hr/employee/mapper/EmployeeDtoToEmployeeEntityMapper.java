@@ -1,14 +1,14 @@
 package com.siit.nationalgrupa3.hr.employee.mapper;
 
 import com.siit.nationalgrupa3.hr.employee.domain.entity.EmployeeEntity;
-import com.siit.nationalgrupa3.hr.employee.domain.model.EmployeeDto;
+import com.siit.nationalgrupa3.hr.employee.domain.model.EmployeeDtoResponse;
 
 import org.springframework.stereotype.Component;
 
 @Component
 public class EmployeeDtoToEmployeeEntityMapper {
 
-    public EmployeeEntity mapDtoToEntity(EmployeeDto dto) {
+    public EmployeeEntity mapDtoToEntity(EmployeeDtoResponse dto) {
         return EmployeeEntity.builder()
 //                          .id(dto.getId())
                              .hiredate(dto.getHiredate())

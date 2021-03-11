@@ -1,5 +1,7 @@
 package com.siit.nationalgrupa3.hr.employee.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.time.LocalDate;
 
 import javax.persistence.Column;
@@ -14,11 +16,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class EmployeeDto {
+public class EmployeeDtoResponse {
 
     private Integer id;
 
