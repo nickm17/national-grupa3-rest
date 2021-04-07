@@ -1,6 +1,6 @@
 package com.siit.nationalgrupa3.jpaex.controller;
 
-import com.siit.nationalgrupa3.jpaex.entity.LibraryEntity;
+import com.siit.nationalgrupa3.jpaex.model.LibraryDto;
 import com.siit.nationalgrupa3.jpaex.service.LibraryService;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,13 +26,13 @@ public class LibraryController {
     private final LibraryService libraryService;
 
     @PostMapping
-    public LibraryEntity create(@Valid @RequestBody LibraryEntity library) {
+    public LibraryDto create(@Valid @RequestBody @NotNull LibraryDto library) {
 
         return libraryService.createLibrary(library);
     }
 
     @GetMapping("/{libraryId}")
-    public LibraryEntity getLibrary(@PathVariable(name = "libraryId") Integer libraryId) {
+    public LibraryDto getLibrary(@PathVariable(name = "libraryId") Integer libraryId) {
 
         return libraryService.getLibrary(libraryId);
     }
@@ -42,8 +43,15 @@ public class LibraryController {
         libraryService.deleteLibrary(libraryId);
     }
 
+    @DeleteMapping("/{libraryId}/books/{bookId}")
+    public void deleteBookFromLibrary(@PathVariable(name = "libraryId") Integer libraryId,
+                                      @PathVariable(name = "bookId") Integer bookId) {
+
+        libraryService.deleteBookFromLibrary(libraryId, bookId);
+    }
+
     @GetMapping()
-    public List<LibraryEntity> getLibraries() {
+    public List<LibraryDto> getLibraries() {
 
         return libraryService.getLibraries();
     }

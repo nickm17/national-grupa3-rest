@@ -1,38 +1,61 @@
 package com.siit.nationalgrupa3.jpaex.service;
 
+import com.siit.nationalgrupa3.ApplicationProperties;
 import com.siit.nationalgrupa3.jpaex.entity.LibraryEntity;
+import com.siit.nationalgrupa3.jpaex.mapper.LibraryMapper;
+import com.siit.nationalgrupa3.jpaex.model.LibraryDto;
 import com.siit.nationalgrupa3.jpaex.repository.LibraryRepository;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class LibraryService {
 
     private final LibraryRepository libraryRepository;
+    private final LibraryMapper libraryMapper;
+    private final ApplicationProperties applicationProperties;
 
-    public LibraryEntity createLibrary(LibraryEntity library) {
+//    @Value("${national.grupa3.rest.library}")
+//    private String newName;
 
-        return libraryRepository.save(library);
+    public LibraryDto createLibrary(LibraryDto libraryDto) {
+        var libraryEntity = libraryMapper.mapDtoToEntity(libraryDto);
+
+        return libraryMapper.mapEntityToDto(libraryRepository.save(libraryEntity));
     }
 
-    public List<LibraryEntity> getLibraries() {
+    public List<LibraryDto> getLibraries() {
         List<LibraryEntity> all = libraryRepository.findAll();
         System.out.println(all.toString());
-        return all;
+        return libraryMapper.mapListEntityToListDto(all);
     }
 
-    public LibraryEntity getLibrary(Integer libraryId) {
+    public LibraryDto getLibrary(Integer libraryId) {
 
-        return libraryRepository.findById(libraryId).get();
+        return libraryMapper.mapEntityToDto(libraryRepository.findById(libraryId).get());
     }
 
     public void deleteLibrary(Integer libraryId) {
 
         libraryRepository.deleteById(libraryId);
+    }
+
+    @Transactional
+    public void deleteBookFromLibrary(Integer libraryId, Integer bookIdToRemove) {
+
+        LibraryEntity libraryEntity = libraryRepository.findById(libraryId).get();
+        libraryEntity.getBooks()
+                         .removeIf(bookEntity -> bookIdToRemove == bookEntity.getId());
+
+        libraryEntity.getBooks().stream()
+                     .forEach(book -> book.setName(applicationProperties.getBookName()));
+
+        libraryEntity.setName(applicationProperties.getLibrary());
     }
 }

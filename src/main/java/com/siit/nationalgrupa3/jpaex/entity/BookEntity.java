@@ -1,7 +1,5 @@
 package com.siit.nationalgrupa3.jpaex.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -28,8 +26,6 @@ public class BookEntity {
     @JoinColumn(name = "library_id")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-//    @JsonIgnore
-    @JsonBackReference(value = "book-library")//is the back part of reference – it will be omitted from serialization.
     private LibraryEntity library;
 
     private String name;

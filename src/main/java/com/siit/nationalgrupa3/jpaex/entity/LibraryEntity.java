@@ -7,6 +7,7 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -25,7 +26,7 @@ public class LibraryEntity {
 
     private String name;
 
-    @OneToMany(mappedBy = "library", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "library", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonManagedReference("book-library") //is the forward part of reference – the one that gets serialized normally.
     private Set<BookEntity> books = new HashSet<>();
 
