@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>DATABASE</ID>
+  <OriginalElement>b65953ed-ebd6-43b0-bc33-a2944c2238ec.TABLE:many-to-many.post</OriginalElement>
+  <nodes>
+    <node x="0.0" y="0.0">b65953ed-ebd6-43b0-bc33-a2944c2238ec.TABLE:many-to-many.post</node>
+    <node x="132.0" y="210.0">b65953ed-ebd6-43b0-bc33-a2944c2238ec.TABLE:many-to-many.post_tag</node>
+    <node x="230.0" y="0.0">b65953ed-ebd6-43b0-bc33-a2944c2238ec.TABLE:many-to-many.tag</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="b65953ed-ebd6-43b0-bc33-a2944c2238ec.TABLE:many-to-many.post_tag" target="b65953ed-ebd6-43b0-bc33-a2944c2238ec.TABLE:many-to-many.tag" relationship="REFERENCES">
+      <point x="44.0" y="-94.5" />
+      <point x="264.0" y="185.0" />
+      <point x="335.0" y="185.0" />
+      <point x="0.0" y="80.0" />
+    </edge>
+    <edge source="b65953ed-ebd6-43b0-bc33-a2944c2238ec.TABLE:many-to-many.post_tag" target="b65953ed-ebd6-43b0-bc33-a2944c2238ec.TABLE:many-to-many.post" relationship="REFERENCES">
+      <point x="-44.0" y="-94.5" />
+      <point x="176.0" y="185.0" />
+      <point x="105.0" y="185.0" />
+      <point x="0.0" y="80.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic" zoom="1.0" showDependencies="false" x="220.0" y="287.5" />
+  <SelectedNodes>
+    <node>b65953ed-ebd6-43b0-bc33-a2944c2238ec.TABLE:many-to-many.post</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Columns</Category>
+    <Category>Key columns</Category>
+    <Category>Virtual foreign keys</Category>
+  </Categories>
+</Diagram>
+
